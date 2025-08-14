@@ -1,6 +1,7 @@
+# Imagen base con PHP 8.1 y Apache
 FROM php:8.1-apache
 
-# Instalar dependencias necesarias
+# Instalar dependencias del sistema necesarias para extensiones de PHP y Moodle
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -27,18 +28,21 @@ RUN apt-get update && apt-get install -y \
         pdo_mysql \
         mbstring
 
-# Clonar Moodle (puedes ajustar versión si deseas otra rama)
+# Clonar Moodle (ajusta la rama si deseas otra versión)
 RUN git clone -b MOODLE_401_STABLE https://github.com/moodle/moodle.git /var/www/html
 
-# Crear directorio moodledata y ajustar permisos
+# Crear el directorio moodledata y establecer permisos correctos
 RUN mkdir -p /var/moodledata && \
     chown -R www-data:www-data /var/moodledata /var/www/html && \
     chmod -R 755 /var/moodledata
 
-# Activar mod_rewrite de Apache
+# Eliminar archivo de mantenimiento si quedó bloqueado en una instalación previa
+RUN rm -f /var/moodledata/climaintenance.html
+
+# Activar módulo rewrite de Apache (requerido por Moodle)
 RUN a2enmod rewrite
 
-# Aumentar max_input_vars a 5000 (recomendado por Moodle)
+# Aumentar max_input_vars como recomienda Moodle
 RUN echo "php_value max_input_vars 5000" >> /etc/apache2/apache2.conf
 
 # Establecer el directorio de trabajo
