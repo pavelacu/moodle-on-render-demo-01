@@ -1,4 +1,3 @@
-# Imagen base
 FROM php:8.1-apache
 
 # Instalar dependencias necesarias
@@ -15,7 +14,6 @@ RUN apt-get update && apt-get install -y \
     mariadb-client \
     libicu-dev \
     libexif-dev \
-    libsoap-optional-dev \
     && docker-php-ext-install \
         gd \
         zip \
@@ -29,7 +27,7 @@ RUN apt-get update && apt-get install -y \
         pdo_mysql \
         mbstring
 
-# Clonar Moodle (cambia la rama si deseas otra versión)
+# Clonar Moodle (puedes ajustar versión si deseas otra rama)
 RUN git clone -b MOODLE_401_STABLE https://github.com/moodle/moodle.git /var/www/html
 
 # Crear directorio moodledata y ajustar permisos
@@ -40,8 +38,8 @@ RUN mkdir -p /var/moodledata && \
 # Activar mod_rewrite de Apache
 RUN a2enmod rewrite
 
-# Aumentar max_input_vars a 5000
+# Aumentar max_input_vars a 5000 (recomendado por Moodle)
 RUN echo "php_value max_input_vars 5000" >> /etc/apache2/apache2.conf
 
-# Directorio de trabajo
+# Establecer el directorio de trabajo
 WORKDIR /var/www/html
